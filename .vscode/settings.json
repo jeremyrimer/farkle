@@ -1,0 +1,19 @@
+{
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/**",
+        "/opt/homebrew/include",
+        "/opt/homebrew/include/SDL3",
+        "/opt/homebrew/include/SDL3_ttf",
+        "/usr/local/include",
+        "/usr/local/include/SDL3",
+        "/usr/local/include/SDL3_ttf"
+    ],
+    "C_Cpp.intelliSenseEngine": "default",
+    "cmake.configureOnOpen": false,
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.generator": "Ninja",
+    "cmake.exportCompileCommandsFile": true,
+    "files.associations": {
+        "iosfwd": "cpp"
+    }
+}
