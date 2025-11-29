@@ -5,9 +5,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
-
-constexpr int WIDTH  = 800;
-constexpr int HEIGHT = 650;
+#include "constants.h"
 
 SDL_Window*   window   = nullptr;
 SDL_Renderer* renderer = nullptr;
@@ -18,11 +16,10 @@ int  playerScore = 0, computerScore = 0;
 int  playerRoll = 1, computerRoll = 1;
 bool rolling = false;
 float rollTimer = 0.0f;
-std::string message = "Click or press Space to roll!";
+std::string message = ROLL_PROMPT.data();
 
 SDL_Texture* createText(const std::string& text, TTF_Font* font, SDL_Color fg) {
     if (text.empty()) return nullptr;
-    // 0 = null-terminated string → safe and fast
     SDL_Surface* surface = TTF_RenderText_Blended(font, text.c_str(), 0, fg);
     if (!surface) {
         SDL_Log("TTF error: %s", SDL_GetError());
@@ -33,7 +30,7 @@ SDL_Texture* createText(const std::string& text, TTF_Font* font, SDL_Color fg) {
     return tex;
 }
 
-void drawDie(int value, int x, int y, int size = 140) {
+void drawDie(int value, int x, int y, int size = DIE_SIZE) {
     SDL_FRect face{ static_cast<float>(x), static_cast<float>(y), 
                     static_cast<float>(size), static_cast<float>(size) };
 
@@ -64,15 +61,16 @@ int main() {
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
 
-    SDL_CreateWindowAndRenderer("Farkle", WIDTH, HEIGHT, 0, &window, &renderer);
+    SDL_CreateWindowAndRenderer(GAME_NAME.data(), SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
     SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
-    fontBig = TTF_OpenFont("assets/Roboto-Medium.ttf", 64);
-    fontMed = TTF_OpenFont("assets/Roboto-Medium.ttf", 36);
+    fontBig = TTF_OpenFont(FONT_PATH.data(), 64);
+    fontMed = TTF_OpenFont(FONT_PATH.data(), 36);
 
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 
     bool quit = false;
+
     while (!quit) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
@@ -81,16 +79,16 @@ int main() {
                              (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_SPACE))) {
                 rolling = true;
                 rollTimer = 0.5f;
-                message = "Rolling...";
+                message = ROLLING_PROMPT.data();
             }
         }
 
         if (rolling) {
             rollTimer -= 1.0f / 60.0f;
-            if (rollTimer > 0.0f) {
+            if (rollTimer > 0.0f) { // mid-roll
                 playerRoll   = std::rand() % 6 + 1;
                 computerRoll = std::rand() % 6 + 1;
-            } else {
+            } else { // the roll is complete
                 rolling = false;
                 playerScore   += playerRoll;
                 computerScore += computerRoll;
@@ -105,15 +103,12 @@ int main() {
         drawDie(playerRoll,   170, 200);
         drawDie(computerRoll, 490, 200);
 
-        SDL_Color white = {255, 255, 255, 255};
-        SDL_Color gold  = {255, 215,   0, 255};
-
         auto renderCentered = [&](const std::string& txt, TTF_Font* f, SDL_Color col, float y) {
             SDL_Texture* tex = createText(txt, f, col);
             if (tex) {
                 float w, h;
                 SDL_GetTextureSize(tex, &w, &h);
-                SDL_FRect dst{(WIDTH - w) / 2.0f, y, w, h};
+                SDL_FRect dst{(SCREEN_WIDTH - w) / 2.0f, y, w, h};
                 SDL_RenderTexture(renderer, tex, nullptr, &dst);
                 SDL_DestroyTexture(tex);
             }
