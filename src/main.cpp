@@ -74,7 +74,10 @@ int main() {
     while (!quit) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_EVENT_QUIT) quit = true;
+            if (e.type == SDL_EVENT_QUIT || 
+                (e.type == SDL_EVENT_KEY_DOWN && 
+                    e.key.key == SDLK_Q))
+                quit = true;
             if (!rolling && (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
                              (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_SPACE))) {
                 rolling = true;
@@ -97,7 +100,7 @@ int main() {
             }
         }
 
-        SDL_SetRenderDrawColor(renderer, 34, 139, 34, 255);
+        SDL_SetRenderDrawColor(renderer, FELT_R, FELT_G, FELT_B, 255);
         SDL_RenderClear(renderer);
 
         drawDie(playerRoll,   170, 200);
@@ -114,9 +117,10 @@ int main() {
             }
         };
 
-        renderCentered(message,                              fontBig, gold,  50.0f);
-        renderCentered("You: " + std::to_string(playerScore),   fontMed, white, 390.0f);
-        renderCentered("Computer: " + std::to_string(computerScore), fontMed, white, 440.0f);
+        renderCentered(GAME_NAME.data(), fontBig, FELT_TEXT, 0.000000001f);
+        renderCentered(message,                              fontBig, GOLD_TEXT,  SCREEN_HEIGHT-100.0);
+        renderCentered("You: " + std::to_string(playerScore),   fontMed, WHITE_TEXT, 390.0f);
+        renderCentered("Computer: " + std::to_string(computerScore), fontMed, WHITE_TEXT, 440.0f);
 
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
