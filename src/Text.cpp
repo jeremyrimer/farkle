@@ -31,7 +31,7 @@ bool Text::loadFont(std::string_view path, int ptsize, int& outFontId) {
 
 void Text::renderCentered(std::string_view text, int fontId, SDL_Color color, float y) const {
     if (text.empty() || fontId < 0 || fontId >= static_cast<int>(fonts_.size())) return;
-    render(text, fontId, color, Screen::WIDTH / 2.0f, y);  // center X
+    render(text, fontId, color, ScreenConstants::WIDTH / 2.0f, y);  // center X
 }
 
 void Text::render(std::string_view text, int fontId, SDL_Color color, float x, float y) const {
