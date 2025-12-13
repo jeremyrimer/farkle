@@ -25,6 +25,7 @@ if(NOT EXISTS ${FONT_PATH})
 endif()
 add_executable(${PROJECT_NAME}
     src/main.cpp
+    src/Text.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)

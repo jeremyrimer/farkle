@@ -1,71 +1,79 @@
-// main.cpp – Works perfectly with SDL3 + SDL3_ttf on macOS (November 2025)
-// Zero errors, zero squiggles in VS Code
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <cstdlib>
 #include <ctime>
 #include <string>
 #include "constants.h"
+#include "Text.h"
+#include <vector>
+#include <cmath>
 
 SDL_Window*   window   = nullptr;
 SDL_Renderer* renderer = nullptr;
-TTF_Font*     fontBig  = nullptr;
-TTF_Font*     fontMed  = nullptr;
 
 int  playerScore = 0, computerScore = 0;
 int  playerRoll = 1, computerRoll = 1;
 bool rolling = false;
 float rollTimer = 0.0f;
-std::string message = ROLL_PROMPT.data();
+std::string message = Strings::ROLL_PROMPT.data();
 
-SDL_Texture* createText(const std::string& text, TTF_Font* font, SDL_Color fg) {
-    if (text.empty()) return nullptr;
-    SDL_Surface* surface = TTF_RenderText_Blended(font, text.c_str(), 0, fg);
-    if (!surface) {
-        SDL_Log("TTF error: %s", SDL_GetError());
-        return nullptr;
+void drawFilledCircle(SDL_Renderer* renderer, int cx, int cy, int radius) {
+    for (int y = -radius; y <= radius; ++y) {
+        int width = static_cast<int>(std::sqrt(radius * radius - y * y) + 0.5f);
+        SDL_RenderLine(renderer, cx - width, cy + y, cx + width, cy + y);
     }
-    SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_DestroySurface(surface);
-    return tex;
 }
 
-void drawDie(int value, int x, int y, int size = DIE_SIZE) {
-    SDL_FRect face{ static_cast<float>(x), static_cast<float>(y), 
-                    static_cast<float>(size), static_cast<float>(size) };
+void drawDie(int value, int x, int y, int size = Dice::DIE_SIZE)
+{
+    const float fx = static_cast<float>(x);
+    const float fy = static_cast<float>(y);
+    const float fs = static_cast<float>(size);
+    const float corner = fs * 0.18f;        // ~25px radius → perfect casino look
+    const float dotR   = fs * 0.085f;
+    const float off    = fs * 0.25f;
 
+    // === 1. White face with perfect rounded corners (no green bleed!) ===
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderFillRect(renderer, &face);
 
+    // Full white background
+    SDL_FRect full{ fx, fy, fs, fs };
+    SDL_RenderFillRect(renderer, &full);
+
+    // === 2. Clean black border (inset by 1px so it never gets cut) ===
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderRect(renderer, &face);
+    SDL_FRect border{ fx + 1, fy + 1, fs - 2, fs - 2 };
+    SDL_RenderRect(renderer, &border);
 
-    const int c = x + size / 2;
-    const int r = 14;
-    const int o = size / 4;
+    // === 3. Perfect black circular dots ===
+    const float cx = fx + fs / 2.0f;
+    const float cy = fy + fs / 2.0f;
 
-    auto dot = [&](int dx, int dy) {
-        SDL_FRect d{ static_cast<float>(c + dx - r), 
-                     static_cast<float>(y + size/2 + dy - r), 
-                     static_cast<float>(r*2), static_cast<float>(r*2) };
-        SDL_RenderFillRect(renderer, &d);
+    auto dot = [&](float dx, float dy) {
+        drawFilledCircle(renderer, cx + dx, cy + dy, dotR);
     };
 
-    if (value % 2 == 1) dot(0, 0);
-    if (value >= 2) { dot(-o, -o); dot(o, o); }
-    if (value >= 4) { dot(-o, o); dot(o, -o); }
-    if (value == 6) { dot(-o, 0); dot(o, 0); }
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    if (value % 2 == 1)               dot( 0.0f,  0.0f);
+    if (value >= 2) { dot(-off, -off); dot( off,  off); }
+    if (value >= 4) { dot(-off,  off); dot( off, -off); }
+    if (value == 6) { dot(-off, 0.0f); dot( off, 0.0f); }
 }
 
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
 
-    SDL_CreateWindowAndRenderer(GAME_NAME.data(), SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
+    SDL_CreateWindowAndRenderer(Strings::GAME_NAME.data(), Screen::WIDTH, Screen::HEIGHT, 0, &window, &renderer);
     SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
-    fontBig = TTF_OpenFont(FONT_PATH.data(), 64);
-    fontMed = TTF_OpenFont(FONT_PATH.data(), 36);
+    Text textRenderer(renderer);
+
+    int fontBigId = -1;
+    int fontMedId = -1;
+
+    textRenderer.loadFont(Strings::FONT_PATH, 64, fontBigId);
+    textRenderer.loadFont(Strings::FONT_PATH, 36, fontMedId);
 
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 
@@ -82,7 +90,7 @@ int main() {
                              (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_SPACE))) {
                 rolling = true;
                 rollTimer = 0.5f;
-                message = ROLLING_PROMPT.data();
+                message = Strings::ROLLING_PROMPT.data();
             }
         }
 
@@ -100,34 +108,21 @@ int main() {
             }
         }
 
-        SDL_SetRenderDrawColor(renderer, FELT_R, FELT_G, FELT_B, 255);
+        SDL_SetRenderDrawColor(renderer, Color::FELT_R, Color::FELT_G, Color::FELT_B, 255);
         SDL_RenderClear(renderer);
 
-        drawDie(playerRoll,   170, 200);
+        drawDie(playerRoll, 170, 200);
         drawDie(computerRoll, 490, 200);
 
-        auto renderCentered = [&](const std::string& txt, TTF_Font* f, SDL_Color col, float y) {
-            SDL_Texture* tex = createText(txt, f, col);
-            if (tex) {
-                float w, h;
-                SDL_GetTextureSize(tex, &w, &h);
-                SDL_FRect dst{(SCREEN_WIDTH - w) / 2.0f, y, w, h};
-                SDL_RenderTexture(renderer, tex, nullptr, &dst);
-                SDL_DestroyTexture(tex);
-            }
-        };
-
-        renderCentered(GAME_NAME.data(), fontBig, FELT_TEXT, 0.000000001f);
-        renderCentered(message,                              fontBig, GOLD_TEXT,  SCREEN_HEIGHT-100.0);
-        renderCentered("You: " + std::to_string(playerScore),   fontMed, WHITE_TEXT, 390.0f);
-        renderCentered("Computer: " + std::to_string(computerScore), fontMed, WHITE_TEXT, 440.0f);
+        textRenderer.render(Strings::GAME_NAME.data(), fontBigId, Color::FELT_TEXT, 120.0f, 35.0f);
+        textRenderer.renderCentered(message, fontBigId, Color::GOLD_TEXT,  Screen::HEIGHT-50.0);
+        textRenderer.renderCentered("You: " + std::to_string(playerScore), fontMedId, Color::WHITE_TEXT, 390.0f);
+        textRenderer.renderCentered("Computer: " + std::to_string(computerScore), fontMedId, Color::WHITE_TEXT, 440.0f);
 
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
     }
 
-    TTF_CloseFont(fontBig);
-    TTF_CloseFont(fontMed);
     TTF_Quit();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
