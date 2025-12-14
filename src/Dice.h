@@ -15,7 +15,7 @@ public:
     void drawDie(int value, int x, int y, int size = DiceConstants::DIE_SIZE) const;
     int rollDie();
 private:
-    SDL_Renderer* renderer_{nullptr};
+    SDL_Renderer* renderer{nullptr};
     
     void drawFilledCircle(int cx, int cy, int radius) const;
 };

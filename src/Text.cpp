@@ -3,8 +3,9 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <iostream>
 #include "constants.h"
+#include <SDL3/SDL_render.h>
 
-Text::Text(SDL_Renderer* renderer) : renderer_(renderer) {
+Text::Text(SDL_Renderer* renderer) : renderer(renderer) {
     if (!TTF_Init()) {
         std::cerr << "TTF_Init failed: " << SDL_GetError() << std::endl;
     }
@@ -41,7 +42,7 @@ void Text::render(std::string_view text, int fontId, SDL_Color color, float x, f
     SDL_Surface* surface = TTF_RenderText_Blended(fonts_[fontId].ttf, text.data(), 0, color);
     if (!surface) return;
 
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_DestroySurface(surface);
     if (!texture) return;
 
@@ -49,6 +50,6 @@ void Text::render(std::string_view text, int fontId, SDL_Color color, float x, f
     SDL_GetTextureSize(texture, &w, &h);
 
     SDL_FRect dst{x - w/2.0f, y - h/2.0f, w, h};  
-    SDL_RenderTexture(renderer_, texture, nullptr, &dst);
+    SDL_RenderTexture(renderer, texture, nullptr, &dst);
     SDL_DestroyTexture(texture);
 }

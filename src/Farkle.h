@@ -25,7 +25,7 @@ public:
 
     void gameLoop();
 private:
-    SDL_Renderer* renderer_{nullptr};
+    SDL_Renderer* renderer{nullptr};
 
     // GAME STATE
     int playerScore = 0; 
@@ -44,7 +44,11 @@ private:
     Dice dice;
     int fontBigId;
     int fontMedId;
+    static constexpr int STATUS_MESSAGE_HEIGHT = ScreenConstants::HEIGHT-50.0;
+    static constexpr float GAME_NAME_X = 120.0f;
+    static constexpr int GAME_NAME_Y = 35.0f;
 
+    // METHODS
     void handleInput();
     void updateState();
     void render();

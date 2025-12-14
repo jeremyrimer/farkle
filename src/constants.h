@@ -19,9 +19,15 @@ namespace DiceConstants {
 }
 
 namespace ColorConstants {
-    constexpr SDL_Color WHITE_TEXT = {255, 255, 255, 255};
-    constexpr SDL_Color GOLD_TEXT  = {255, 215,   0, 255};
-    constexpr SDL_Color FELT_TEXT = {0, 175, 0, 255};
+    constexpr SDL_Color WHITE = {255, 255, 255, 255};
+    constexpr SDL_Color BLACK = {0, 0, 0, 255};
+    constexpr SDL_Color GOLD  = {255, 215, 0, 255};
+    constexpr SDL_Color FELT_GREEN = {0, 175, 0, 255};
+    constexpr SDL_Color LIGHT_YELLOW = {255, 255, 100, 255};
+    constexpr SDL_Color BLUE{ 50, 100, 200, 255 }; 
+    constexpr SDL_Color LIGHTER_BLUE{ 70, 130, 255, 255 }; 
+    constexpr SDL_Color DARK_BLUE{ 30, 80, 180, 255 }; 
+
     constexpr int FELT_R = 34;
     constexpr int FELT_G = 139;
     constexpr int FELT_B = 34;

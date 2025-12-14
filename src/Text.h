@@ -17,9 +17,8 @@ public:
     bool loadFont(std::string_view path, int ptsize, int& outFontId);
     void renderCentered(std::string_view text, int fontId, SDL_Color color, float y) const;
     void render(std::string_view text, int fontId, SDL_Color color, float x, float y) const;
-
 private:
-    SDL_Renderer* renderer_{nullptr};
+    SDL_Renderer* renderer{nullptr};
 
     struct Font {
         TTF_Font* ttf{nullptr};

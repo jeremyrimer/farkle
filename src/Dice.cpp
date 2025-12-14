@@ -4,13 +4,13 @@
 #include "constants.h"
 #include <cmath>
 
-Dice::Dice(SDL_Renderer* renderer) : renderer_(renderer) {}
+Dice::Dice(SDL_Renderer* renderer) : renderer(renderer) {}
 Dice::~Dice() {}
 
 void Dice::drawFilledCircle(int cx, int cy, int radius) const {
     for (int y = -radius; y <= radius; ++y) {
         int width = static_cast<int>(std::sqrt(radius * radius - y * y) + 0.5f);
-        SDL_RenderLine(renderer_, cx - width, cy + y, cx + width, cy + y);
+        SDL_RenderLine(renderer, cx - width, cy + y, cx + width, cy + y);
     }
 }
 
@@ -24,16 +24,27 @@ void Dice::drawDie(int value, int x, int y, int size) const
     const float off    = fs * 0.25f;
 
     // === 1. White face with perfect rounded corners (no green bleed!) ===
-    SDL_SetRenderDrawColor(renderer_, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(
+        renderer, 
+        ColorConstants::WHITE.r,
+        ColorConstants::WHITE.g,
+        ColorConstants::WHITE.b, 
+        ColorConstants::WHITE.a);
 
     // Full white background
     SDL_FRect full{ fx, fy, fs, fs };
-    SDL_RenderFillRect(renderer_, &full);
+    SDL_RenderFillRect(renderer, &full);
 
     // === 2. Clean black border (inset by 1px so it never gets cut) ===
-    SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(
+        renderer, 
+        ColorConstants::BLACK.r, 
+        ColorConstants::BLACK.g, 
+        ColorConstants::BLACK.b, 
+        ColorConstants::BLACK.a
+    );
     SDL_FRect border{ fx + 1, fy + 1, fs - 2, fs - 2 };
-    SDL_RenderRect(renderer_, &border);
+    SDL_RenderRect(renderer, &border);
 
     // === 3. Perfect black circular dots ===
     const float cx = fx + fs / 2.0f;
@@ -43,7 +54,13 @@ void Dice::drawDie(int value, int x, int y, int size) const
         drawFilledCircle(cx + dx, cy + dy, dotR);
     };
 
-    SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(
+        renderer, 
+        ColorConstants::BLACK.r, 
+        ColorConstants::BLACK.g, 
+        ColorConstants::BLACK.b, 
+        ColorConstants::BLACK.a
+    );
     if (value % 2 == 1) dot( 0.0f,  0.0f);
     if (value >= 2) { dot(-off, -off); dot( off,  off); }
     if (value >= 4) { dot(-off,  off); dot( off, -off); }
