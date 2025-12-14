@@ -31,3 +31,21 @@ file(GLOB_RECURSE SOURCES
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
+
+# ==================== UNIT TESTS ====================
+
+# Enable testing
+enable_testing()
+
+# Find Google Test (brew installs it here)
+find_package(GTest REQUIRED)
+
+# Test executable
+file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp)
+
+add_executable(run_tests ${TEST_SOURCES} ${GAME_SOURCES})  # reuse game code
+target_link_libraries(run_tests PRIVATE GTest::gtest GTest::gtest_main SDL3::SDL3 SDL3_ttf::SDL3_ttf)
+target_include_directories(run_tests PRIVATE src)
+
+# Register tests with CTest
+add_test(NAME unit_tests COMMAND run_tests)

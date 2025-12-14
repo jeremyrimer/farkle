@@ -15,7 +15,7 @@ namespace StringConstants {
 }
 
 namespace DiceConstants {
-    constexpr int DIE_SIZE = 120;
+    constexpr int DIE_SIZE = 100;
 }
 
 namespace ColorConstants {

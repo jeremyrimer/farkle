@@ -46,14 +46,14 @@ void Farkle::updateState() {
         message = StringConstants::ROLLING_PROMPT.data();
         rollTimer -= 1.0f / 60.0f;
         if (rollTimer > 0.0f) { // mid-roll
-            playerRoll   = dice.rollDie();
-            computerRoll = dice.rollDie();
+            dieValue1 = dice.rollDie();
+            dieValue2 = dice.rollDie();
+            dieValue3 = dice.rollDie();
+            dieValue4 = dice.rollDie();
+            dieValue5 = dice.rollDie();
         } else { // the roll is complete
             rolling = false;
-            playerScore   += playerRoll;
-            computerScore += computerRoll;
-            message = (playerRoll > computerRoll) ? "You win this round!" :
-                        (playerRoll < computerRoll) ? "Computer wins!" : "Tie!";
+            message = "roll complete";
         }
     }
 }
@@ -61,14 +61,19 @@ void Farkle::updateState() {
 void Farkle::render() {
     SDL_SetRenderDrawColor(renderer_, ColorConstants::FELT_R, ColorConstants::FELT_G, ColorConstants::FELT_B, 255);
     SDL_RenderClear(renderer_);
+    int dieRenderY = 100;
+    int dieRenderX = 50;
 
-    dice.drawDie(playerRoll, 170, 200);
-    dice.drawDie(computerRoll, 490, 200);
+    dice.drawDie(dieValue1, DieLayout::getDieXPosition(1), dieRenderY, DiceConstants::DIE_SIZE);
+    dice.drawDie(dieValue2, DieLayout::getDieXPosition(2), dieRenderY, DiceConstants::DIE_SIZE);
+    dice.drawDie(dieValue3, DieLayout::getDieXPosition(3), dieRenderY, DiceConstants::DIE_SIZE);
+    dice.drawDie(dieValue4, DieLayout::getDieXPosition(4), dieRenderY, DiceConstants::DIE_SIZE);
+    dice.drawDie(dieValue5, DieLayout::getDieXPosition(5), dieRenderY, DiceConstants::DIE_SIZE);
 
     text.render(StringConstants::GAME_NAME.data(), fontBigId, ColorConstants::FELT_TEXT, 120.0f, 35.0f);
     text.renderCentered(message, fontBigId, ColorConstants::GOLD_TEXT,  ScreenConstants::HEIGHT-50.0);
-    text.renderCentered("You: " + std::to_string(playerScore), fontMedId, ColorConstants::WHITE_TEXT, 390.0f);
-    text.renderCentered("Computer: " + std::to_string(computerScore), fontMedId, ColorConstants::WHITE_TEXT, 440.0f);
+    // text.renderCentered("You: " + std::to_string(playerScore), fontMedId, ColorConstants::WHITE_TEXT, 390.0f);
+    // text.renderCentered("Computer: " + std::to_string(computerScore), fontMedId, ColorConstants::WHITE_TEXT, 440.0f);
 
     SDL_RenderPresent(renderer_);
 }

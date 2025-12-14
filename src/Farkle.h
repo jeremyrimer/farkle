@@ -14,6 +14,15 @@ public:
     Farkle(const Farkle&) = delete;
     Farkle& operator=(const Farkle&) = delete;
 
+    struct DieLayout {
+        static constexpr int SPACING  = 20;   // pixels between dice
+        static constexpr int START_X  = 100;  // left margin
+
+        static int getDieXPosition(int dieNumber) {
+            return START_X + ((dieNumber-1) * (DiceConstants::DIE_SIZE + SPACING));
+        }
+    };
+
     void gameLoop();
 private:
     SDL_Renderer* renderer_{nullptr};
@@ -21,8 +30,13 @@ private:
     // GAME STATE
     int playerScore = 0; 
     int computerScore = 0;
-    int playerRoll = 1;
-    int computerRoll = 1;
+
+    int dieValue1 = 1;
+    int dieValue2 = 1;
+    int dieValue3 = 1;
+    int dieValue4 = 1;
+    int dieValue5 = 1;
+
     bool quit = false;
     bool rolling = false;
     float rollTimer = 0.0f;
