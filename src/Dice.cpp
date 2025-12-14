@@ -5,10 +5,7 @@
 #include "constants.h"
 #include <cmath>
 
-Dice::Dice(SDL_Renderer* renderer) : renderer_(renderer) {
-
-}
-
+Dice::Dice(SDL_Renderer* renderer) : renderer_(renderer) {}
 Dice::~Dice() {}
 
 void Dice::drawFilledCircle(int cx, int cy, int radius) const {

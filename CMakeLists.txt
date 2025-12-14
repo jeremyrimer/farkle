@@ -23,10 +23,11 @@ if(NOT EXISTS ${FONT_PATH})
         message(FATAL_ERROR "Font download failed")
     endif()
 endif()
-add_executable(${PROJECT_NAME}
-    src/main.cpp
-    src/Text.cpp
-    src/Dice.cpp
+
+file(GLOB_RECURSE SOURCES
+    src/*.cpp
+    src/*.c
 )
+add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
