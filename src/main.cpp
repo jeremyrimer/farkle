@@ -1,12 +1,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
-#include <cstdlib>
-#include <ctime>
-#include <string>
 #include "constants.h"
 #include "Farkle.h"
-#include <vector>
-#include <cmath>
 
 SDL_Window*   window   = nullptr;
 SDL_Renderer* renderer = nullptr;

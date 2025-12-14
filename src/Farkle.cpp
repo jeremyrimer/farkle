@@ -6,7 +6,6 @@
 #include "constants.h"
 #include "Text.h"
 #include "Dice.h"
-#include <vector>
 #include <cmath>
 
 Farkle::Farkle(SDL_Renderer* renderer) : 
@@ -32,7 +31,7 @@ void Farkle::handleInput() {
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_EVENT_QUIT || 
             (e.type == SDL_EVENT_KEY_DOWN && 
-                e.key.key == SDLK_Q))
+                (e.key.key == SDLK_Q | e.key.key == SDLK_ESCAPE)))
             quit = true;
         if (!rolling && (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
                             (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_SPACE))) {
