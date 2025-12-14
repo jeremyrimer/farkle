@@ -43,3 +43,5 @@ if [ -f build/Farkle ]; then
 else
     echo "Game executable not found."
 fi
+
+echo "Game Over!"

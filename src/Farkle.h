@@ -31,12 +31,8 @@ private:
     int playerScore = 0; 
     int computerScore = 0;
 
-    int dieValue1 = 1;
-    int dieValue2 = 1;
-    int dieValue3 = 1;
-    int dieValue4 = 1;
-    int dieValue5 = 1;
-    int dieValue6 = 1;
+    std::vector<int> diceRack;
+    std::vector<bool> heldDice;
 
     bool quit = false;
     bool rolling = false;
@@ -52,4 +48,5 @@ private:
     void handleInput();
     void updateState();
     void render();
+    void rollDice();
 };
