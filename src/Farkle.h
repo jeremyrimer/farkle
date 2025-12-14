@@ -16,7 +16,7 @@ public:
 
     struct DieLayout {
         static constexpr int SPACING  = 20;   // pixels between dice
-        static constexpr int START_X  = 100;  // left margin
+        static constexpr int START_X  = 50;  // left margin
 
         static int getDieXPosition(int dieNumber) {
             return START_X + ((dieNumber-1) * (DiceConstants::DIE_SIZE + SPACING));
@@ -36,6 +36,7 @@ private:
     int dieValue3 = 1;
     int dieValue4 = 1;
     int dieValue5 = 1;
+    int dieValue6 = 1;
 
     bool quit = false;
     bool rolling = false;

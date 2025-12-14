@@ -51,6 +51,7 @@ void Farkle::updateState() {
             dieValue3 = dice.rollDie();
             dieValue4 = dice.rollDie();
             dieValue5 = dice.rollDie();
+            dieValue6 = dice.rollDie();
         } else { // the roll is complete
             rolling = false;
             message = "roll complete";
@@ -69,6 +70,7 @@ void Farkle::render() {
     dice.drawDie(dieValue3, DieLayout::getDieXPosition(3), dieRenderY, DiceConstants::DIE_SIZE);
     dice.drawDie(dieValue4, DieLayout::getDieXPosition(4), dieRenderY, DiceConstants::DIE_SIZE);
     dice.drawDie(dieValue5, DieLayout::getDieXPosition(5), dieRenderY, DiceConstants::DIE_SIZE);
+    dice.drawDie(dieValue6, DieLayout::getDieXPosition(6), dieRenderY, DiceConstants::DIE_SIZE);
 
     text.render(StringConstants::GAME_NAME.data(), fontBigId, ColorConstants::FELT_TEXT, 120.0f, 35.0f);
     text.renderCentered(message, fontBigId, ColorConstants::GOLD_TEXT,  ScreenConstants::HEIGHT-50.0);
