@@ -32,4 +32,8 @@ private:
     Dice dice;
     int fontBigId;
     int fontMedId;
+
+    void handleInput();
+    void updateState();
+    void render();
 };
