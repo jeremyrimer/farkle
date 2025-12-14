@@ -17,7 +17,7 @@ public:
     Dice& operator=(const Dice&) = delete;
 
     void drawDie(int value, int x, int y, int size = DiceConstants::DIE_SIZE) const;
-
+    int rollDie();
 private:
     SDL_Renderer* renderer_{nullptr};
     

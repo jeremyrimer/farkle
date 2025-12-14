@@ -56,8 +56,8 @@ int main() {
         if (rolling) {
             rollTimer -= 1.0f / 60.0f;
             if (rollTimer > 0.0f) { // mid-roll
-                playerRoll   = std::rand() % 6 + 1;
-                computerRoll = std::rand() % 6 + 1;
+                playerRoll   = diceRenderer.rollDie();
+                computerRoll = diceRenderer.rollDie();
             } else { // the roll is complete
                 rolling = false;
                 playerScore   += playerRoll;

@@ -53,3 +53,7 @@ void Dice::drawDie(int value, int x, int y, int size) const
     if (value >= 4) { dot(-off,  off); dot( off, -off); }
     if (value == 6) { dot(-off, 0.0f); dot( off, 0.0f); }
 }
+
+int Dice::rollDie() {
+    return std::rand() % 6 + 1;
+}
