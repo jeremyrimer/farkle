@@ -10,7 +10,7 @@ namespace ScreenConstants {
 namespace StringConstants {
     constexpr std::string_view GAME_NAME = "FARKLE";
     constexpr std::string_view FONT_PATH = "assets/Roboto-Medium.ttf";
-    constexpr std::string_view ROLL_PROMPT = "[Space] or Click to Roll";
+    constexpr std::string_view ROLL_PROMPT = "Ready for Farkle?";
     constexpr std::string_view ROLLING_PROMPT = "Rolling...";
 }
 

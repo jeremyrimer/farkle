@@ -75,7 +75,7 @@ void Farkle::updateState() {
             rollDice();
         } else { // the roll is complete
             rolling = false;
-            message = "roll complete";
+            message = "";
         }
     }
 }
@@ -114,7 +114,7 @@ void Farkle::render() {
     }
 
     text.render(StringConstants::GAME_NAME.data(), fontBigId, ColorConstants::FELT_GREEN, GAME_NAME_X, GAME_NAME_Y);
-    text.renderCentered(message, fontBigId, ColorConstants::GOLD, STATUS_MESSAGE_HEIGHT);
+    text.renderCentered(message, fontMedId, ColorConstants::GOLD, STATUS_MESSAGE_HEIGHT);
 
     if (rollButton) {
         rollButton->render();
