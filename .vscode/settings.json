@@ -87,6 +87,10 @@
         "condition_variable": "cpp",
         "map": "cpp",
         "set": "cpp",
-        "span": "cpp"
+        "span": "cpp",
+        "csignal": "cpp",
+        "fstream": "cpp",
+        "list": "cpp",
+        "unordered_set": "cpp"
     }
 }

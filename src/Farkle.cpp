@@ -16,6 +16,30 @@ Farkle::Farkle(SDL_Renderer* renderer) :
   heldDice(6, false) {
     text.loadFont(StringConstants::FONT_PATH, 64, fontBigId);
     text.loadFont(StringConstants::FONT_PATH, 36, fontMedId);
+    text.loadFont(StringConstants::FONT_PATH, 24, fontSmallId);
+
+    rollButton.emplace(
+      renderer,
+      text,
+      fontSmallId,
+      "Roll",
+      "Rolling",
+      50,
+      ScreenConstants::HEIGHT - 80,
+      200,
+      50
+    );
+    bankButton.emplace(
+      renderer,
+      text,
+      fontSmallId,
+      "Bank",
+      "Banking",
+      300,
+      ScreenConstants::HEIGHT - 80,
+      200,
+      50
+    );
   }
 Farkle::~Farkle() {}
 
@@ -67,7 +91,6 @@ void Farkle::rollDice() {
 void Farkle::render() {
     SDL_SetRenderDrawColor(renderer, ColorConstants::FELT_R, ColorConstants::FELT_G, ColorConstants::FELT_B, 255);
     SDL_RenderClear(renderer);
-    int dieRenderY = 100;
 
     for (size_t i = 0; i < diceRack.size(); ++i) {
         int x = DieLayout::getDieXPosition(static_cast<int>(i+1));
@@ -81,19 +104,24 @@ void Farkle::render() {
                 ColorConstants::LIGHT_YELLOW.b, 
                 ColorConstants::LIGHT_YELLOW.a
             );
-            SDL_FRect border{ static_cast<float>(x - 8), static_cast<float>(dieRenderY - 8),
+            SDL_FRect border{ static_cast<float>(x - 8), static_cast<float>(DIE_RENDER_Y - 8),
                               static_cast<float>(DiceConstants::DIE_SIZE + 16),
                               static_cast<float>(DiceConstants::DIE_SIZE + 16) };
             SDL_RenderRect(renderer, &border);
         }
 
-        dice.drawDie(diceRack[i], x, dieRenderY, DiceConstants::DIE_SIZE);
+        dice.drawDie(diceRack[i], x, DIE_RENDER_Y, DiceConstants::DIE_SIZE);
     }
 
     text.render(StringConstants::GAME_NAME.data(), fontBigId, ColorConstants::FELT_GREEN, GAME_NAME_X, GAME_NAME_Y);
     text.renderCentered(message, fontBigId, ColorConstants::GOLD, STATUS_MESSAGE_HEIGHT);
-    // text.renderCentered("You: " + std::to_string(playerScore), fontMedId, ColorConstants::WHITE_TEXT, 390.0f);
-    // text.renderCentered("Computer: " + std::to_string(computerScore), fontMedId, ColorConstants::WHITE_TEXT, 440.0f);
 
+    if (rollButton) {
+        rollButton->render();
+    }
+
+    if (bankButton) {
+        bankButton->render();
+    }
     SDL_RenderPresent(renderer);
 }

@@ -5,6 +5,8 @@
 #include "Text.h"
 #include "Dice.h"
 #include <string>
+#include "Button.h"
+#include <optional>
 
 class Farkle {
 public:
@@ -44,9 +46,14 @@ private:
     Dice dice;
     int fontBigId;
     int fontMedId;
-    static constexpr int STATUS_MESSAGE_HEIGHT = ScreenConstants::HEIGHT-50.0;
+    int fontSmallId;
+    static constexpr int STATUS_MESSAGE_HEIGHT = 250;
     static constexpr float GAME_NAME_X = 120.0f;
     static constexpr int GAME_NAME_Y = 35.0f;
+    static constexpr int DIE_RENDER_Y = 100;
+
+    std::optional<Button> rollButton;
+    std::optional<Button> bankButton;
 
     // METHODS
     void handleInput();
