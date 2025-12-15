@@ -30,6 +30,16 @@ private:
     SDL_Renderer* renderer{nullptr};
 
     // GAME STATE
+    enum class TurnState {
+        NotStarted,    // waiting for player to roll
+        Rolled,        // rolled but can choose to hold
+        Scoring,       // scoring dice, choosing to bank
+        TurnOver       // turn ended
+    };
+
+    TurnState turnState{TurnState::NotStarted};
+
+    bool playersTurn = true;
     int playerScore = 0; 
     int computerScore = 0;
     int handScore = 0;
@@ -75,4 +85,7 @@ private:
     void updateState();
     void render();
     void rollDice();
+    void startTurn();
+    void bankPoints();
+    void nextPlayer();
 };

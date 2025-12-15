@@ -96,6 +96,7 @@ void Farkle::handleInput() {
 }
 
 void Farkle::updateState() {
+
     if (rolling) {
         message = StringConstants::ROLLING_PROMPT.data();
         rollTimer -= 1.0f / 60.0f;
@@ -106,12 +107,9 @@ void Farkle::updateState() {
             message = "Roll Score: " + std::to_string(handScore);
         }
     }
+
     if (banking) {
-        playerScore += handScore;
-        handScore = 0;
-        for (size_t i = 0; i < diceRects.size(); ++i) {
-            heldDice[i] = false;
-        }
+        bankPoints();
         banking = false;
     }
 
@@ -125,6 +123,7 @@ void Farkle::rollDice() {
             diceRack[i] = std::rand() % 6 + 1;
         }
     }
+    turnState = TurnState::Rolled;
 }
 
 void Farkle::render() {
@@ -169,4 +168,26 @@ void Farkle::render() {
         bankButton->render();
     }
     SDL_RenderPresent(renderer);
+}
+
+void Farkle::startTurn() {
+    turnState = TurnState::NotStarted;
+    handScore = 0;
+    std::fill(heldDice.begin(), heldDice.end(), false);
+}
+
+void Farkle::bankPoints() {
+    if (playersTurn) {
+      playerScore += handScore;
+    }
+    else {
+      computerScore += handScore;
+    }
+    turnState = TurnState::TurnOver;
+    nextPlayer();
+    startTurn();
+}
+
+void Farkle::nextPlayer() {
+    playersTurn = !playersTurn;
 }
