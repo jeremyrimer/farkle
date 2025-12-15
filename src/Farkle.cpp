@@ -26,8 +26,8 @@ Farkle::Farkle(SDL_Renderer* renderer) :
       fontSmallId,
       "Roll",
       "Roll",
-      50,
-      ScreenConstants::HEIGHT - 80,
+      25,
+      ScreenConstants::HEIGHT - 140,
       200,
       50
     );
@@ -37,7 +37,7 @@ Farkle::Farkle(SDL_Renderer* renderer) :
       fontSmallId,
       "Bank",
       "Bank",
-      300,
+      25,
       ScreenConstants::HEIGHT - 80,
       200,
       50
@@ -103,8 +103,16 @@ void Farkle::updateState() {
             rollDice();
         } else { // the roll is complete
             rolling = false;
-            message = "";
+            message = "Roll Score: " + std::to_string(handScore);
         }
+    }
+    if (banking) {
+        playerScore += handScore;
+        handScore = 0;
+        for (size_t i = 0; i < diceRects.size(); ++i) {
+            heldDice[i] = false;
+        }
+        banking = false;
     }
 
     rollButton->updateState();
@@ -149,6 +157,9 @@ void Farkle::render() {
 
     text.render(StringConstants::GAME_NAME.data(), fontBigId, ColorConstants::FELT_GREEN, GAME_NAME_X, GAME_NAME_Y);
     text.renderCentered(message, fontMedId, ColorConstants::GOLD, STATUS_MESSAGE_HEIGHT);
+
+    text.render(std::to_string(playerScore), fontMedId, ColorConstants::WHITE, 300, ScreenConstants::HEIGHT - 55);
+    text.render("Opponent: " + std::to_string(computerScore), fontMedId, ColorConstants::WHITE, 620, ScreenConstants::HEIGHT - 55);
 
     if (rollButton) {
         rollButton->render();

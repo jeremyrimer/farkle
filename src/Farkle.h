@@ -60,6 +60,8 @@ private:
     static constexpr float GAME_NAME_X = 120.0f;
     static constexpr int GAME_NAME_Y = 35.0f;
     static constexpr int DIE_RENDER_Y = 75;
+    static constexpr int YOUR_SCORE_X = 500;
+    static constexpr int YOUR_SCORE_Y = 300;
 
     std::optional<Button> rollButton;
     std::optional<Button> bankButton;
