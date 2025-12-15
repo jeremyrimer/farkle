@@ -7,11 +7,13 @@
 #include "Text.h"
 #include "Dice.h"
 #include <cmath>
+#include <iostream>
 
 Farkle::Farkle(SDL_Renderer* renderer) : 
   renderer(renderer), 
   text(renderer), 
   dice(renderer), 
+  diceRects(6),
   diceRack(6, 1),
   heldDice(6, false) {
     text.loadFont(StringConstants::FONT_PATH, 64, fontBigId);
@@ -55,16 +57,38 @@ void Farkle::gameLoop() {
 void Farkle::handleInput() {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
+
         if (e.type == SDL_EVENT_QUIT || 
             (e.type == SDL_EVENT_KEY_DOWN && 
                 (e.key.key == SDLK_Q | e.key.key == SDLK_ESCAPE)))
             quit = true;
+
         if (rollButton) rollButton->handleEvent(e);
         if (bankButton) bankButton->handleEvent(e);
+
+        if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && 
+              e.button.button == SDL_BUTTON_LEFT) {
+            if (!mouseLeftWasDownLastFrame) {
+                float mx = static_cast<float>(e.button.x);
+                float my = static_cast<float>(e.button.y);
+
+                for (size_t i = 0; i < diceRects.size(); ++i) {
+                    const auto& dr = diceRects[i];
+                    if (mx >= dr.bounds.x && mx <= dr.bounds.x + dr.bounds.w &&
+                        my >= dr.bounds.y && my <= dr.bounds.y + dr.bounds.h) {
+                        heldDice[dr.diceRackIndex] = !heldDice[dr.diceRackIndex];
+                        break;
+                    }
+                }
+                mouseLeftWasDownLastFrame = true;
+            }
+        } else mouseLeftWasDownLastFrame = false;
+
         if (!rolling && (rollButton ? rollButton->isClicked() : false)) {
             rolling = true;
             rollTimer = 0.5f;
         }
+
         if (!banking && (bankButton ? bankButton->isClicked() : false)) {
             banking = true;
         }
@@ -103,6 +127,12 @@ void Farkle::render() {
         int x = DieLayout::getDieXPosition(static_cast<int>(i+1));
 
         // Highlight held dice
+        SDL_FRect borderHighlight{ 
+            static_cast<float>(x - 8), 
+            static_cast<float>(DIE_RENDER_Y - 8),
+            static_cast<float>(DiceConstants::DIE_SIZE + 16),
+            static_cast<float>(DiceConstants::DIE_SIZE + 16) 
+        };
         if (heldDice[i]) {
             SDL_SetRenderDrawColor(
                 renderer, 
@@ -111,12 +141,9 @@ void Farkle::render() {
                 ColorConstants::LIGHT_YELLOW.b, 
                 ColorConstants::LIGHT_YELLOW.a
             );
-            SDL_FRect border{ static_cast<float>(x - 8), static_cast<float>(DIE_RENDER_Y - 8),
-                              static_cast<float>(DiceConstants::DIE_SIZE + 16),
-                              static_cast<float>(DiceConstants::DIE_SIZE + 16) };
-            SDL_RenderRect(renderer, &border);
+            SDL_RenderRect(renderer, &borderHighlight);
         }
-
+        diceRects[i] = DiceRect{borderHighlight, i};
         dice.drawDie(diceRack[i], x, DIE_RENDER_Y, DiceConstants::DIE_SIZE);
     }
 

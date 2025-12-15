@@ -10,7 +10,6 @@ int  playerScore = 0, computerScore = 0;
 int  playerRoll = 1, computerRoll = 1;
 bool rolling = false;
 float rollTimer = 0.0f;
-std::string message = StringConstants::ROLL_PROMPT.data();
 
 int main() {
     // INIT SDL

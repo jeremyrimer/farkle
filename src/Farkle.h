@@ -32,15 +32,15 @@ private:
     // GAME STATE
     int playerScore = 0; 
     int computerScore = 0;
+    int handScore = 0;
 
     std::vector<int> diceRack;
     std::vector<bool> heldDice;
 
     struct DiceRect {
       SDL_FRect bounds;
-      int index;  // which die in diceRack
+      size_t diceRackIndex;
     };
-
     std::vector<DiceRect> diceRects;
 
     bool quit = false;
@@ -49,12 +49,13 @@ private:
     float rollTimer = 0.0f;
 
     // DISPLAY
-    std::string message = StringConstants::ROLL_PROMPT.data();
+    std::string message = StringConstants::INIT_MSG.data();
     Text text;
     Dice dice;
     int fontBigId;
     int fontMedId;
     int fontSmallId;
+
     static constexpr int STATUS_MESSAGE_HEIGHT = 210;
     static constexpr float GAME_NAME_X = 120.0f;
     static constexpr int GAME_NAME_Y = 35.0f;
@@ -65,7 +66,7 @@ private:
 
     bool rollPressed{false};
     bool bankPressed{false};
-    
+    bool mouseLeftWasDownLastFrame{false};
 
     // METHODS
     void handleInput();
