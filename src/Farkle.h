@@ -36,6 +36,13 @@ private:
     std::vector<int> diceRack;
     std::vector<bool> heldDice;
 
+    struct DiceRect {
+      SDL_FRect bounds;
+      int index;  // which die in diceRack
+    };
+
+    std::vector<DiceRect> diceRects;
+
     bool quit = false;
     bool rolling = false;
     bool banking = false;
@@ -48,16 +55,17 @@ private:
     int fontBigId;
     int fontMedId;
     int fontSmallId;
-    static constexpr int STATUS_MESSAGE_HEIGHT = 250;
+    static constexpr int STATUS_MESSAGE_HEIGHT = 210;
     static constexpr float GAME_NAME_X = 120.0f;
     static constexpr int GAME_NAME_Y = 35.0f;
-    static constexpr int DIE_RENDER_Y = 100;
+    static constexpr int DIE_RENDER_Y = 75;
 
     std::optional<Button> rollButton;
     std::optional<Button> bankButton;
 
     bool rollPressed{false};
     bool bankPressed{false};
+    
 
     // METHODS
     void handleInput();

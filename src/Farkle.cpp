@@ -23,7 +23,7 @@ Farkle::Farkle(SDL_Renderer* renderer) :
       text,
       fontSmallId,
       "Roll",
-      "Rolling",
+      "Roll",
       50,
       ScreenConstants::HEIGHT - 80,
       200,
@@ -34,7 +34,7 @@ Farkle::Farkle(SDL_Renderer* renderer) :
       text,
       fontSmallId,
       "Bank",
-      "Banking",
+      "Bank",
       300,
       ScreenConstants::HEIGHT - 80,
       200,
@@ -59,11 +59,6 @@ void Farkle::handleInput() {
             (e.type == SDL_EVENT_KEY_DOWN && 
                 (e.key.key == SDLK_Q | e.key.key == SDLK_ESCAPE)))
             quit = true;
-        // if (!rolling && (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
-        //                     (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_SPACE))) {
-        //     rolling = true;
-        //     rollTimer = 0.5f;
-        // }
         if (rollButton) rollButton->handleEvent(e);
         if (bankButton) bankButton->handleEvent(e);
         if (!rolling && (rollButton ? rollButton->isClicked() : false)) {
@@ -87,6 +82,9 @@ void Farkle::updateState() {
             message = "";
         }
     }
+
+    rollButton->updateState();
+    bankButton->updateState();
 }
 
 void Farkle::rollDice() {

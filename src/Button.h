@@ -18,6 +18,7 @@ public:
         float h = 50.0f
     );
 
+    void updateState();
     void render() const;
     void handleEvent(const SDL_Event& e);
     bool isClicked() const;
@@ -32,4 +33,5 @@ private:
     SDL_FRect bounds;
     bool hovered{false};
     bool pressed{false};
+    bool wasPressedLastFrame{false};
 };
