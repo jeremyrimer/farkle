@@ -45,7 +45,7 @@ void Button::handleEvent(const SDL_Event& e) {
 }
 
 bool Button::isClicked() const {
-    return hovered && !pressed;
+    return hovered && pressed;
 }
 
 void Button::render() const {

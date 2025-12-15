@@ -59,10 +59,19 @@ void Farkle::handleInput() {
             (e.type == SDL_EVENT_KEY_DOWN && 
                 (e.key.key == SDLK_Q | e.key.key == SDLK_ESCAPE)))
             quit = true;
-        if (!rolling && (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
-                            (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_SPACE))) {
+        // if (!rolling && (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
+        //                     (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_SPACE))) {
+        //     rolling = true;
+        //     rollTimer = 0.5f;
+        // }
+        if (rollButton) rollButton->handleEvent(e);
+        if (bankButton) bankButton->handleEvent(e);
+        if (!rolling && (rollButton ? rollButton->isClicked() : false)) {
             rolling = true;
             rollTimer = 0.5f;
+        }
+        if (!banking && (bankButton ? bankButton->isClicked() : false)) {
+            banking = true;
         }
     }
 }

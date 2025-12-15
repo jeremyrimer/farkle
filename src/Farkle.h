@@ -38,6 +38,7 @@ private:
 
     bool quit = false;
     bool rolling = false;
+    bool banking = false;
     float rollTimer = 0.0f;
 
     // DISPLAY
@@ -54,6 +55,9 @@ private:
 
     std::optional<Button> rollButton;
     std::optional<Button> bankButton;
+
+    bool rollPressed{false};
+    bool bankPressed{false};
 
     // METHODS
     void handleInput();
