@@ -1,6 +1,8 @@
 #pragma once
 #include <SDL3/SDL.h>
 #include <string_view>
+#include <array>
+#include <string>
 
 namespace ScreenConstants {
     constexpr int WIDTH  = 800;
@@ -31,4 +33,26 @@ namespace ColorConstants {
     constexpr int FELT_R = 34;
     constexpr int FELT_G = 139;
     constexpr int FELT_B = 34;
+}
+
+// GAME STATE
+enum class TurnState {
+    NotStarted,    // waiting for player to roll
+    Rolled,        // rolled but can choose to hold
+    Scoring,       // scoring dice, choosing to bank
+    TurnOver,      // turn ended
+    COUNT          // for the number of TurnStates
+};
+
+inline const std::array<const char*, static_cast<size_t>(TurnState::COUNT)> TurnStateStrings{
+    "NotStarted",
+    "Rolling",
+    "Banking",
+    "Finished"
+};
+
+inline std::string to_string(TurnState state) {
+    size_t index = static_cast<size_t>(state);
+    if (index >= TurnStateStrings.size()) return "Unknown";
+    return TurnStateStrings[index];
 }

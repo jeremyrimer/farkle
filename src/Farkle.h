@@ -6,6 +6,7 @@
 #include "Dice.h"
 #include <string>
 #include "Button.h"
+#include "Debug.h"
 #include <optional>
 
 class Farkle {
@@ -29,20 +30,15 @@ public:
 private:
     SDL_Renderer* renderer{nullptr};
 
-    // GAME STATE
-    enum class TurnState {
-        NotStarted,    // waiting for player to roll
-        Rolled,        // rolled but can choose to hold
-        Scoring,       // scoring dice, choosing to bank
-        TurnOver       // turn ended
-    };
-
     TurnState turnState{TurnState::NotStarted};
 
+    bool lastRound = false;
     bool playersTurn = true;
     int playerScore = 0; 
     int computerScore = 0;
     int handScore = 0;
+    bool playerWins = false;
+    bool computerWins = false;
 
     std::vector<int> diceRack;
     std::vector<bool> heldDice;
@@ -75,6 +71,7 @@ private:
 
     std::optional<Button> rollButton;
     std::optional<Button> bankButton;
+    std::optional<Debug> debugModule;
 
     bool rollPressed{false};
     bool bankPressed{false};
@@ -88,4 +85,7 @@ private:
     void startTurn();
     void bankPoints();
     void nextPlayer();
+    void tallyHandScore();
+    void checkWin();
+    bool checkFarkle();
 };

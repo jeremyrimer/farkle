@@ -3,8 +3,23 @@
 # Ensure we're in the project root
 cd "$(dirname "$0")"
 
-# Remove old build folder if needed (optional, but helps with fresh starts)
-# rm -rf build
+CLEAN=false
+
+# Parse arguments
+for arg in "$@"; do
+    case $arg in
+        --clean|-c)
+            CLEAN=true
+            shift
+            ;;
+    esac
+done
+
+# Optional clean step
+if [ "$CLEAN" = true ]; then
+    echo "Cleaning build directory..."
+    rm -rf build
+fi
 
 # Configure with Ninja if not already done
 if [ ! -f build/build.ninja ]; then
@@ -22,18 +37,16 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Run tests (executable is in build/)
+# Run tests (optional)
 if [ -f build/run_tests ]; then
     echo "Running tests..."
     ./build/run_tests
+    if [ $? -ne 0 ]; then
+        echo "Tests failed!"
+        exit 1
+    fi
 else
-    echo "Test executable not found. Did you add files to tests/ folder?"
-fi
-
-# Check if build succeeded
-if [ $? -ne 0 ]; then
-    echo "Tests failed!"
-    exit 1
+    echo "Test executable not found. Skipping tests."
 fi
 
 # Run the game

@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "Text.h"
 #include "Dice.h"
+#include "Debug.h"
 #include <cmath>
 #include <iostream>
 
@@ -18,12 +19,14 @@ Farkle::Farkle(SDL_Renderer* renderer) :
   heldDice(6, false) {
     text.loadFont(StringConstants::FONT_PATH, 64, fontBigId);
     text.loadFont(StringConstants::FONT_PATH, 36, fontMedId);
-    text.loadFont(StringConstants::FONT_PATH, 24, fontSmallId);
+    text.loadFont(StringConstants::FONT_PATH, 12, fontSmallId);
+
+    debugModule.emplace(renderer, text, fontSmallId);
 
     rollButton.emplace(
       renderer,
       text,
-      fontSmallId,
+      fontMedId,
       "Roll",
       "Roll",
       25,
@@ -34,7 +37,7 @@ Farkle::Farkle(SDL_Renderer* renderer) :
     bankButton.emplace(
       renderer,
       text,
-      fontSmallId,
+      fontMedId,
       "Bank",
       "Bank",
       25,
@@ -66,7 +69,8 @@ void Farkle::handleInput() {
         if (rollButton) rollButton->handleEvent(e);
         if (bankButton) bankButton->handleEvent(e);
 
-        if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && 
+        if (playersTurn && turnState == TurnState::Rolled &&
+            e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && 
               e.button.button == SDL_BUTTON_LEFT) {
             if (!mouseLeftWasDownLastFrame) {
                 float mx = static_cast<float>(e.button.x);
@@ -89,14 +93,15 @@ void Farkle::handleInput() {
             rollTimer = 0.5f;
         }
 
-        if (!banking && (bankButton ? bankButton->isClicked() : false)) {
+        if (!banking && 
+            playersTurn && turnState == TurnState::Rolled &&
+            (bankButton ? bankButton->isClicked() : false)) {
             banking = true;
         }
     }
 }
 
 void Farkle::updateState() {
-
     if (rolling) {
         message = StringConstants::ROLLING_PROMPT.data();
         rollTimer -= 1.0f / 60.0f;
@@ -105,12 +110,16 @@ void Farkle::updateState() {
         } else { // the roll is complete
             rolling = false;
             message = "Roll Score: " + std::to_string(handScore);
+            // increment handScore by amount present in held hand
+            tallyHandScore();
         }
     }
 
     if (banking) {
+        turnState = TurnState::Scoring;
         bankPoints();
-        banking = false;
+        checkWin();
+        startTurn();
     }
 
     rollButton->updateState();
@@ -156,9 +165,10 @@ void Farkle::render() {
 
     text.render(StringConstants::GAME_NAME.data(), fontBigId, ColorConstants::FELT_GREEN, GAME_NAME_X, GAME_NAME_Y);
     text.renderCentered(message, fontMedId, ColorConstants::GOLD, STATUS_MESSAGE_HEIGHT);
-
-    text.render(std::to_string(playerScore), fontMedId, ColorConstants::WHITE, 300, ScreenConstants::HEIGHT - 55);
-    text.render("Opponent: " + std::to_string(computerScore), fontMedId, ColorConstants::WHITE, 620, ScreenConstants::HEIGHT - 55);
+    SDL_Color playerColor = playersTurn ? ColorConstants::LIGHT_YELLOW : ColorConstants::WHITE;
+    SDL_Color computerColor = !playersTurn ? ColorConstants::LIGHT_YELLOW : ColorConstants::WHITE;
+    text.render(std::to_string(playerScore), fontMedId, playerColor, 300, ScreenConstants::HEIGHT - 55);
+    text.render("Opponent: " + std::to_string(computerScore), fontMedId, computerColor, 620, ScreenConstants::HEIGHT - 55);
 
     if (rollButton) {
         rollButton->render();
@@ -167,27 +177,51 @@ void Farkle::render() {
     if (bankButton) {
         bankButton->render();
     }
+
     SDL_RenderPresent(renderer);
 }
 
 void Farkle::startTurn() {
+    nextPlayer();
     turnState = TurnState::NotStarted;
     handScore = 0;
     std::fill(heldDice.begin(), heldDice.end(), false);
 }
 
 void Farkle::bankPoints() {
+    turnState = TurnState::Scoring;
     if (playersTurn) {
       playerScore += handScore;
     }
     else {
       computerScore += handScore;
     }
-    turnState = TurnState::TurnOver;
-    nextPlayer();
-    startTurn();
+    handScore = 0;
+    banking = false;
 }
 
 void Farkle::nextPlayer() {
     playersTurn = !playersTurn;
+}
+
+void Farkle::tallyHandScore() {
+    // calculate held dice and add it to handScore
+}
+
+void Farkle::checkWin() {
+    if (lastRound) {
+        if (playerScore >= 10000) {
+            playerWins = true;
+            message = "YOU WON!";
+        }
+        else if (computerScore >= 10000) {
+            computerWins = true;
+            message = "YOU LOSE";
+        }
+    }
+}
+
+bool Farkle::checkFarkle() {
+    // return true if dice in farkle state, false if not
+    return false;
 }
