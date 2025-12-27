@@ -66,52 +66,58 @@ void Farkle::handleInput() {
                 (e.key.key == SDLK_Q | e.key.key == SDLK_ESCAPE)))
             quit = true;
 
-        if (rollButton) rollButton->handleEvent(e);
-        if (bankButton) bankButton->handleEvent(e);
+        // mouse button press detected
+        if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+            if (playersTurn && 
+                turnState == TurnState::Rolled &&
+                e.button.button == SDL_BUTTON_LEFT) {
 
-        if (playersTurn && turnState == TurnState::Rolled &&
-            e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && 
-              e.button.button == SDL_BUTTON_LEFT) {
-            if (!mouseLeftWasDownLastFrame) {
-                float mx = static_cast<float>(e.button.x);
-                float my = static_cast<float>(e.button.y);
+                // HOLD detection
+                if (!mouseLeftWasDownLastFrame) {
+                    float mx = static_cast<float>(e.button.x);
+                    float my = static_cast<float>(e.button.y);
 
-                for (size_t i = 0; i < diceRects.size(); ++i) {
-                    const auto& dr = diceRects[i];
-                    if (mx >= dr.bounds.x && mx <= dr.bounds.x + dr.bounds.w &&
-                        my >= dr.bounds.y && my <= dr.bounds.y + dr.bounds.h) {
-                        heldDice[dr.diceRackIndex] = !heldDice[dr.diceRackIndex];
-                        break;
+                    for (size_t i = 0; i < diceRects.size(); ++i) {
+                        const auto& dr = diceRects[i];
+                        if (mx >= dr.bounds.x && mx <= dr.bounds.x + dr.bounds.w &&
+                            my >= dr.bounds.y && my <= dr.bounds.y + dr.bounds.h) {
+                            heldDice[dr.diceRackIndex] = !heldDice[dr.diceRackIndex];
+                            break;
+                        }
                     }
+                    mouseLeftWasDownLastFrame = true;
                 }
-                mouseLeftWasDownLastFrame = true;
-            }
-        } else mouseLeftWasDownLastFrame = false;
 
+            }
+        }  else mouseLeftWasDownLastFrame = false;
+
+        rollButton->handleEvent(e);
         if (!rolling && (rollButton ? rollButton->isClicked() : false)) {
             rolling = true;
             rollTimer = 0.5f;
         }
 
+        bankButton->handleEvent(e);
         if (!banking && 
             playersTurn && turnState == TurnState::Rolled &&
             (bankButton ? bankButton->isClicked() : false)) {
             banking = true;
         }
+
+        debugModule->handleEvent(e);
     }
 }
 
 void Farkle::updateState() {
     if (rolling) {
+        turnState = TurnState::Rolling;
         message = StringConstants::ROLLING_PROMPT.data();
         rollTimer -= 1.0f / 60.0f;
         if (rollTimer > 0.0f) { // mid-roll
             rollDice();
         } else { // the roll is complete
             rolling = false;
-            message = "Roll Score: " + std::to_string(handScore);
-            // increment handScore by amount present in held hand
-            tallyHandScore();
+            turnState = TurnState::Rolled;
         }
     }
 
@@ -122,6 +128,7 @@ void Farkle::updateState() {
         startTurn();
     }
 
+    debugModule->update(turnState, playersTurn);
     rollButton->updateState();
     bankButton->updateState();
 }
@@ -132,7 +139,6 @@ void Farkle::rollDice() {
             diceRack[i] = std::rand() % 6 + 1;
         }
     }
-    turnState = TurnState::Rolled;
 }
 
 void Farkle::render() {
@@ -178,12 +184,16 @@ void Farkle::render() {
         bankButton->render();
     }
 
+    if (debugModule) {
+        debugModule->render();
+    }
+
     SDL_RenderPresent(renderer);
 }
 
 void Farkle::startTurn() {
     nextPlayer();
-    turnState = TurnState::NotStarted;
+    turnState = TurnState::FirstRoll;
     handScore = 0;
     std::fill(heldDice.begin(), heldDice.end(), false);
 }
@@ -206,6 +216,7 @@ void Farkle::nextPlayer() {
 
 void Farkle::tallyHandScore() {
     // calculate held dice and add it to handScore
+
 }
 
 void Farkle::checkWin() {

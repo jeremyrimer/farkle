@@ -33,5 +33,6 @@ private:
     SDL_FRect bounds;
     bool hovered{false};
     bool pressed{false};
+    bool disabled{false};
     bool wasPressedLastFrame{false};
 };

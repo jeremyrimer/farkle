@@ -28,7 +28,8 @@ namespace ColorConstants {
     constexpr SDL_Color LIGHT_YELLOW = {255, 255, 100, 255};
     constexpr SDL_Color BLUE{ 50, 100, 200, 255 }; 
     constexpr SDL_Color LIGHTER_BLUE{ 70, 130, 255, 255 }; 
-    constexpr SDL_Color DARK_BLUE{ 30, 80, 180, 255 }; 
+    constexpr SDL_Color DARK_BLUE{ 30, 80, 180, 255 };
+    constexpr SDL_Color GRAY{ 100, 100, 100, 255 };
 
     constexpr int FELT_R = 34;
     constexpr int FELT_G = 139;
@@ -37,7 +38,8 @@ namespace ColorConstants {
 
 // GAME STATE
 enum class TurnState {
-    NotStarted,    // waiting for player to roll
+    FirstRoll,     // waiting for player to roll 1st time
+    Rolling,       // dice shuffling
     Rolled,        // rolled but can choose to hold
     Scoring,       // scoring dice, choosing to bank
     TurnOver,      // turn ended
@@ -45,10 +47,11 @@ enum class TurnState {
 };
 
 inline const std::array<const char*, static_cast<size_t>(TurnState::COUNT)> TurnStateStrings{
-    "NotStarted",
+    "First Roll",
     "Rolling",
-    "Banking",
-    "Finished"
+    "Rolled",
+    "Scoring",
+    "Turn Over"
 };
 
 inline std::string to_string(TurnState state) {

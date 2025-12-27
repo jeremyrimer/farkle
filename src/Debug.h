@@ -23,6 +23,7 @@ private:
     int fontId{0};
 
     bool show{false};
-    TurnState turnState{TurnState::NotStarted};
+    bool showWasDownLastFrame{false};
+    TurnState turnState{TurnState::FirstRoll};
     bool playerTurn{true};
 };

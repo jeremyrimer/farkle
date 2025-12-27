@@ -21,26 +21,28 @@ Button::Button(
 {}
 
 void Button::handleEvent(const SDL_Event& e) {
-    if (e.type == SDL_EVENT_MOUSE_MOTION) {
-        float mx = (float)e.motion.x;
-        float my = (float)e.motion.y;
+    if (!disabled) {
+        if (e.type == SDL_EVENT_MOUSE_MOTION) {
+            float mx = (float)e.motion.x;
+            float my = (float)e.motion.y;
 
-        hovered =
-            mx >= bounds.x &&
-            mx <= bounds.x + bounds.w &&
-            my >= bounds.y &&
-            my <= bounds.y + bounds.h;
-    }
+            hovered =
+                mx >= bounds.x &&
+                mx <= bounds.x + bounds.w &&
+                my >= bounds.y &&
+                my <= bounds.y + bounds.h;
+        }
 
-    if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
-        e.button.button == SDL_BUTTON_LEFT &&
-        hovered) {
-        pressed = true;
-    }
+        if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
+            e.button.button == SDL_BUTTON_LEFT &&
+            hovered) {
+            pressed = true;
+        }
 
-    if (e.type == SDL_EVENT_MOUSE_BUTTON_UP &&
-        e.button.button == SDL_BUTTON_LEFT) {
-        pressed = false;
+        if (e.type == SDL_EVENT_MOUSE_BUTTON_UP &&
+            e.button.button == SDL_BUTTON_LEFT) {
+            pressed = false;
+        }
     }
 }
 
@@ -54,7 +56,16 @@ bool Button::isClicked() const {
 
 void Button::render() const {
     // Background
-    if (pressed) {
+    if (disabled) {
+        SDL_SetRenderDrawColor(
+            renderer, 
+            ColorConstants::LIGHTER_BLUE.r, 
+            ColorConstants::LIGHTER_BLUE.g, 
+            ColorConstants::LIGHTER_BLUE.b, 
+            ColorConstants::LIGHTER_BLUE.a
+        );
+    }
+    else if (pressed) {
         SDL_SetRenderDrawColor(
             renderer, 
             ColorConstants::LIGHTER_BLUE.r, 

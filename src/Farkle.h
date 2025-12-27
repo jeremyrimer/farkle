@@ -30,7 +30,7 @@ public:
 private:
     SDL_Renderer* renderer{nullptr};
 
-    TurnState turnState{TurnState::NotStarted};
+    TurnState turnState{TurnState::FirstRoll};
 
     bool lastRound = false;
     bool playersTurn = true;
