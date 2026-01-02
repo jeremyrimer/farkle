@@ -12,11 +12,8 @@
 
 Farkle::Farkle(SDL_Renderer* renderer) : 
   renderer(renderer), 
-  text(renderer), 
-  dice(renderer), 
-  diceRects(6),
-  diceRack(6, 1),
-  heldDice(6, false) {
+  text(renderer){
+    diceRack.reserve(DiceConstants::NUM_DICE);
     text.loadFont(StringConstants::FONT_PATH, 64, fontBigId);
     text.loadFont(StringConstants::FONT_PATH, 36, fontMedId);
     text.loadFont(StringConstants::FONT_PATH, 12, fontSmallId);
@@ -49,6 +46,7 @@ Farkle::Farkle(SDL_Renderer* renderer) :
 Farkle::~Farkle() {}
 
 void Farkle::gameLoop() {
+    initDice();
     while (!quit) {
         handleInput();
         updateState();
@@ -77,11 +75,11 @@ void Farkle::handleInput() {
                     float mx = static_cast<float>(e.button.x);
                     float my = static_cast<float>(e.button.y);
 
-                    for (size_t i = 0; i < diceRects.size(); ++i) {
-                        const auto& dr = diceRects[i];
-                        if (mx >= dr.bounds.x && mx <= dr.bounds.x + dr.bounds.w &&
-                            my >= dr.bounds.y && my <= dr.bounds.y + dr.bounds.h) {
-                            heldDice[dr.diceRackIndex] = !heldDice[dr.diceRackIndex];
+                    for (size_t i = 0; i < diceRack.size(); ++i) {
+                        const auto& bounds = diceRack[i].getBounds();
+                        if (mx >= bounds.x && mx <= bounds.x + bounds.w &&
+                            my >= bounds.y && my <= bounds.y + bounds.h) {
+                            diceRack[i].toggleHeld();
                             break;
                         }
                     }
@@ -118,6 +116,11 @@ void Farkle::updateState() {
         } else { // the roll is complete
             rolling = false;
             turnState = TurnState::Rolled;
+            if (playersTurn) {
+                message = StringConstants::ROLLED_PROMPT.data();
+            } else {
+                message = StringConstants::COMPUTER_THINKING.data();
+            }
         }
     }
 
@@ -135,8 +138,8 @@ void Farkle::updateState() {
 
 void Farkle::rollDice() {
     for (size_t i = 0; i < diceRack.size(); ++i) {
-        if (!heldDice[i]) {
-            diceRack[i] = std::rand() % 6 + 1;
+        if (!diceRack[i].isHeld()) {
+            diceRack[i].roll();
         }
     }
 }
@@ -146,27 +149,7 @@ void Farkle::render() {
     SDL_RenderClear(renderer);
 
     for (size_t i = 0; i < diceRack.size(); ++i) {
-        int x = DieLayout::getDieXPosition(static_cast<int>(i+1));
-
-        // Highlight held dice
-        SDL_FRect borderHighlight{ 
-            static_cast<float>(x - 8), 
-            static_cast<float>(DIE_RENDER_Y - 8),
-            static_cast<float>(DiceConstants::DIE_SIZE + 16),
-            static_cast<float>(DiceConstants::DIE_SIZE + 16) 
-        };
-        if (heldDice[i]) {
-            SDL_SetRenderDrawColor(
-                renderer, 
-                ColorConstants::LIGHT_YELLOW.r, 
-                ColorConstants::LIGHT_YELLOW.g,
-                ColorConstants::LIGHT_YELLOW.b, 
-                ColorConstants::LIGHT_YELLOW.a
-            );
-            SDL_RenderRect(renderer, &borderHighlight);
-        }
-        diceRects[i] = DiceRect{borderHighlight, i};
-        dice.drawDie(diceRack[i], x, DIE_RENDER_Y, DiceConstants::DIE_SIZE);
+        diceRack[i].render(i, DiceConstants::DIE_SIZE);
     }
 
     text.render(StringConstants::GAME_NAME.data(), fontBigId, ColorConstants::FELT_GREEN, GAME_NAME_X, GAME_NAME_Y);
@@ -195,7 +178,6 @@ void Farkle::startTurn() {
     nextPlayer();
     turnState = TurnState::FirstRoll;
     handScore = 0;
-    std::fill(heldDice.begin(), heldDice.end(), false);
 }
 
 void Farkle::bankPoints() {
@@ -235,4 +217,10 @@ void Farkle::checkWin() {
 bool Farkle::checkFarkle() {
     // return true if dice in farkle state, false if not
     return false;
+}
+
+void Farkle::initDice() {
+    for (size_t i = 0; i < DiceConstants::NUM_DICE; ++i) {
+        diceRack.emplace_back(renderer, i);
+    }
 }

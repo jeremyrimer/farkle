@@ -17,15 +17,6 @@ public:
     Farkle(const Farkle&) = delete;
     Farkle& operator=(const Farkle&) = delete;
 
-    struct DieLayout {
-        static constexpr int SPACING  = 20;   // pixels between dice
-        static constexpr int START_X  = 50;  // left margin
-
-        static int getDieXPosition(int dieNumber) {
-            return START_X + ((dieNumber-1) * (DiceConstants::DIE_SIZE + SPACING));
-        }
-    };
-
     void gameLoop();
 private:
     SDL_Renderer* renderer{nullptr};
@@ -40,14 +31,7 @@ private:
     bool playerWins = false;
     bool computerWins = false;
 
-    std::vector<int> diceRack;
-    std::vector<bool> heldDice;
-
-    struct DiceRect {
-      SDL_FRect bounds;
-      size_t diceRackIndex;
-    };
-    std::vector<DiceRect> diceRects;
+    std::vector<Dice> diceRack;
 
     bool quit = false;
     bool rolling = false;
@@ -57,7 +41,6 @@ private:
     // DISPLAY
     std::string message = StringConstants::INIT_MSG.data();
     Text text;
-    Dice dice;
     int fontBigId;
     int fontMedId;
     int fontSmallId;
@@ -65,7 +48,6 @@ private:
     static constexpr int STATUS_MESSAGE_HEIGHT = 210;
     static constexpr float GAME_NAME_X = 120.0f;
     static constexpr int GAME_NAME_Y = 35.0f;
-    static constexpr int DIE_RENDER_Y = 75;
     static constexpr int YOUR_SCORE_X = 500;
     static constexpr int YOUR_SCORE_Y = 300;
 
@@ -78,6 +60,7 @@ private:
     bool mouseLeftWasDownLastFrame{false};
 
     // METHODS
+    void initDice();
     void handleInput();
     void updateState();
     void render();

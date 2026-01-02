@@ -14,10 +14,14 @@ namespace StringConstants {
     constexpr std::string_view FONT_PATH = "assets/Roboto-Medium.ttf";
     constexpr std::string_view INIT_MSG = "Are you ready?";
     constexpr std::string_view ROLLING_PROMPT = "Rolling...";
+    constexpr std::string_view ROLLED_PROMPT = "Go!";
+    constexpr std::string_view COMPUTER_THINKING = "Thinking...";
 }
 
 namespace DiceConstants {
     constexpr int DIE_SIZE = 100;
+    constexpr int DIE_RENDER_Y = 75;
+    constexpr int NUM_DICE = 6;
 }
 
 namespace ColorConstants {
